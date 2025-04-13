@@ -1,0 +1,29 @@
+.healthbar {
+    display: flex;
+    align-items: center;
+    border: solid rgb(255, 255, 255);
+    border-radius: 3%;
+    width: 90%;
+    
+}
+
+.bar {
+    height: 80%;
+    width: 50%;
+    border: solid rgb(118, 118, 118);
+}
+
+.barFilling {
+    padding: 1.5%;
+    background-color:  rgb(0, 255, 13);
+    border: solid rgb(0, 255, 13);
+}
+
+.hpText {
+    text-align: center;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    font-family: Consolas, 'Courier New', monospace;
+    font-weight: bold;
+    margin-left: 2%;
+}
