@@ -1,10 +1,13 @@
 # 🐾 Creature Trainer Playground
 
-**Creature Trainer Playground** is a learning project where I explore `vanilla JavaScript` (with a few helper packages), [PIXI.js](https://pixijs.com/) for rendering, and `Vite` for bundling. It runs on a node.js backend, and is going to implement real-time features using `socket.io`. It uses postgresql for the DB.
+**Creature Trainer Playground** is a learning project where I learn `vanilla JavaScript` (with a few helper packages), `PIXI.js` for rendering, and `Vite` for bundling. Im also teaching myself `node.js` which is used for the backend, and I am also going to use `socket.io` for realtime features such as battles. For the Database this project uses `postgreSQL`.
 
 ## The Idea
 
 **Creature Trainer** is a game where you can tame, collect, breed, and evolve creatures, then use them in battles against other players. The Game loop and battle mechanics are going to be further developed in the future for now this is basically using pokemon and digimon as a reference until I understand the Tech and can really start diving into Game ideas and concepts.
+
+`Current Battle UI`
+![CurrentBattleUI](CurrentBattleUI.png)
 
 ## Tech Stack
 
@@ -48,16 +51,8 @@ npm run dev
 npm start
 ```
 
-Make sure both frontend and backend are running in parallel.
+Make sure both frontend and backend are running in parallel. 
 
-## Goals
-
-This project is mainly for self-learning:
-
-- Deepen understanding of JS and TypeScript without relying on big frameworks
-- Get hands-on with rendering using PIXI.js
-- Learn scalable code structure for games
-- Explore real-time features using WebSockets
 
 
 
