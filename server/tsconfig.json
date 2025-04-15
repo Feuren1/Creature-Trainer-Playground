@@ -7,9 +7,12 @@
     "strict": true,               
     "skipLibCheck": true,         
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist"            
+    "outDir": "./dist",
+    "typeRoots": ["./node_modules/@types", "./types"]  
   },
   "include": [
-    "server.ts"                   
+    "server.ts",
+    "middleware/**/*.ts",
+    "types/**/*.d.ts"  // Add this line to include your custom types directory
   ]
 }
