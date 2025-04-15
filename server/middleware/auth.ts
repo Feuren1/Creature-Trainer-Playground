@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import 'dotenv/config'
 import { UserPayload } from '../types/user';
 
+
 const SECRET = process.env.JWT_SECRET
 
 export function authenticateToken(req: Request, res: Response, next: NextFunction){

@@ -1,3 +1,10 @@
+
+enum Rank {
+    BRONZE = "BRONZE",
+    SILVER = "SILVER",
+    GOLD = "GOLD"
+}
+
 export type RegisterUser = {
     username: string
     password: string
@@ -13,4 +20,10 @@ export type User = {
 export interface UserPayload {
     id: number;
     username: string;
-  }
+}
+
+export type Trainer = {
+    userName: string;
+    rank: Rank;
+    //profilpicture
+}

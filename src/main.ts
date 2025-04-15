@@ -4,8 +4,13 @@ import { HealthBar } from "./components/battleUI/healthbar/healthbar.ts";
 import { Application, Assets, Container, Renderer, Sprite } from "pixi.js";
 import { Creature } from "./types/creature.ts";
 import { Element } from "./types/element.ts";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
+import { BattleService } from "./services/battleService.ts";
+import { BattleRenderer } from "./renderer/battleRenderer.ts";
 
+const socket = io("http://localhost:3000");
+const battleService: BattleService = new BattleService(socket);
+let battleRenderer: BattleRenderer;
 const battleLogText: string =
   "THIS IS A BATTLE LOG HE HIT FOR 100 DAMAGE OUCH!!";
 
@@ -68,8 +73,6 @@ const currentCreatureP2: Creature = {
   currentHp: 0,
 };
 
-/* You could loop over an array and create these but for now its fine this way as it makes referencing them and
-    swapping creatures easier for now */
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
 <div id="container" class="${styles.container}"> 
 <div id="mainContainer"class="${styles.mainContainer}">
@@ -153,7 +156,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     resolution: window.devicePixelRatio || 1,
     autoDensity: true,
   });
-
+  battleRenderer = new BattleRenderer(app);
   container.appendChild(app.canvas);
   app.canvas.className = `${styles["pixi-canvas"]}`;
   const mainContainer = new Container();
@@ -161,168 +164,26 @@ document.addEventListener("DOMContentLoaded", async function () {
     loadData();
     setAttacks();
     setLevel();
-    renderPlayerCreature(app, "P1", currentCreatureP1);
-    renderPlayerCreature(app, "P2", currentCreatureP2);
-    renderCreatureElementSymbol(app, "P1", currentCreatureP1);
-    renderCreatureElementSymbol(app, "P2", currentCreatureP2);
-    renderTeamCreatureSymbols(app, "P1", creaturesP1);
-    renderTeamCreatureSymbols(app, "P2", creaturesP2);
-    app.stage.addChild(mainContainer);
-    window.addEventListener("resize", () => handleResize(app));
     
-    const socket = io("http://localhost:3000");
-    socket.emit("message", "Hello from client");
-    socket.on("message", (data) => {
-      console.log("Received from server:", data);
-    });
+    battleRenderer.renderPlayerCreature("P1", currentCreatureP1);
+    battleRenderer.renderPlayerCreature("P2", currentCreatureP2);
+    battleRenderer.renderCreatureElementSymbol("P1", currentCreatureP1);
+    battleRenderer.renderCreatureElementSymbol("P2", currentCreatureP2);
+    battleRenderer.renderTeamCreatureSymbols("P1", creaturesP1);
+    battleRenderer.renderTeamCreatureSymbols("P2", creaturesP2);
+    app.stage.addChild(mainContainer);
+    window.addEventListener("resize", () => battleRenderer.handleResize(app));
+
+    
+    
   } catch (error) {
     console.error("Failed to load asset:", error);
   }
 });
 
-async function renderCreatureElementSymbol(
-  app: Application,
-  player: "P1" | "P2",
-  creature: Creature
-) {
-  const creatureSymbolContainer = new Container();
-  const creatureSymbolDiv = document.getElementById(
-    `creatureElementSymbol${player}`
-  );
-  if (!creatureSymbolDiv) {
-    console.error("Could not find the creatureP1 div");
-    return;
-  }
-  const divRect = creatureSymbolDiv.getBoundingClientRect();
-  creatureSymbolContainer.x = divRect.left;
-  creatureSymbolContainer.y = divRect.top;
 
-  try {
-    const asset = await Assets.load(`/src/assets/${creature.element}-icon.jpg`);
-    const creatureSymbol = new Sprite(asset);
 
-    creatureSymbol.x = 0;
-    creatureSymbol.y = 0;
-    creatureSymbol.width = divRect.width;
-    creatureSymbol.height = divRect.height;
 
-    creatureSymbolContainer.addChild(creatureSymbol);
-    app.stage.addChild(creatureSymbolContainer);
-  } catch (error) {
-    console.error("Failed to load asset:", error);
-  }
-}
-
-/* Write it so that you can pass the player aswell */
-async function renderPlayerCreature(
-  app: Application,
-  player: "P1" | "P2",
-  creature: Creature
-): Promise<void> {
-  const creatureP1Container = new Container();
-  const creatureP1Div = document.getElementById(`creature${player}`);
-  if (!creatureP1Div) {
-    console.error("Could not find the creatureP1 div");
-    return;
-  }
-
-  const divRectP1 = creatureP1Div.getBoundingClientRect();
-  creatureP1Container.x = divRectP1.left;
-  creatureP1Container.y = divRectP1.top;
-
-  try {
-    const asset = await Assets.load(`/src/assets/${creature.name}.png`);
-    const creatureP1 = new Sprite(asset);
-
-    creatureP1.x = 0;
-    creatureP1.y = 0;
-    creatureP1.width = divRectP1.width;
-    creatureP1.height = divRectP1.height;
-
-    creatureP1Container.addChild(creatureP1);
-    app.stage.addChild(creatureP1Container);
-  } catch (error) {
-    console.error("Failed to load asset:", error);
-  }
-}
-
-function handleResize(app: Application<Renderer>): any {
-  const container = document.getElementById("mainContainer");
-  if (!container) return;
-
-  const { width, height } = container.getBoundingClientRect();
-  app.canvas.style.width = `${width}px`;
-  app.canvas.style.height = `${height}px`;
-
-  repositionPixiElements(app);
-}
-
-function repositionPixiElements(app: Application) {
-  app.stage.children.forEach((container) => {
-    if (container instanceof Container && container.children.length > 0) {
-      const sprite = container.children[0] as Sprite;
-
-      let targetDivId = "";
-      if (sprite.label === "logo") targetDivId = "mainContainer";
-      else if (
-        sprite.texture.baseTexture.resource?.url?.includes("Salamander")
-      ) {
-        targetDivId =
-          container.x < app.screen.width / 2 ? "creatureP1" : "creatureP2";
-      } else if (
-        sprite.texture.baseTexture.resource?.url?.includes("flame-icon")
-      ) {
-        targetDivId = "creatureSymbolP1";
-      }
-
-      if (targetDivId) {
-        const targetDiv = document.getElementById(targetDivId);
-        if (targetDiv) {
-          const rect = targetDiv.getBoundingClientRect();
-          container.x = rect.left;
-          container.y = rect.top;
-          sprite.width = rect.width;
-          sprite.height = rect.height;
-        }
-      }
-    }
-  });
-}
-
-/*
-@param pass either p1 or p2 for rendering player one or player two 
- */
-async function renderTeamCreatureSymbols(
-  app: Application,
-  player: "P1" | "P2",
-  creatures: string[]
-): Promise<void> {
-  for (let i = 0; i < 6; i++) {
-    const container = new Container();
-    const div = document.getElementById(`team${player}CreatureSymbol${i + 1}`);
-
-    if (div) {
-      const divRect = div.getBoundingClientRect();
-      container.x = divRect.left;
-      container.y = divRect.top;
-
-      try {
-        const asset = await Assets.load(`/src/assets/${creatures[i]}.png`);
-        const creatureP1 = new Sprite(asset);
-
-        creatureP1.x = 0;
-        creatureP1.y = 0;
-        creatureP1.width = divRect.width;
-        creatureP1.height = divRect.height;
-
-        container.addChild(creatureP1);
-        app.stage.addChild(container);
-      } catch (error) {
-        console.error("Failed to load asset:", error);
-      }
-    }
-  }
-}
 
 /* Loads the data and injects it into the HTML elements
  */
@@ -350,6 +211,7 @@ function loadData() {
   if (creatureNamePlayer2Element) {
     creatureNamePlayer2Element.textContent = currentCreatureP2.name;
   }
+  
 }
 
 function setAttacks() {
@@ -363,6 +225,22 @@ function setAttacks() {
     attack3.textContent = currentCreatureP1.attacks[2].name;
     attack4.textContent = currentCreatureP1.attacks[3].name;
   }
+    attack1?.addEventListener("click", () => {
+      console.log("CLICKED")
+      battleService.sendAttack(currentCreatureP1.attacks[0])
+    })
+    attack2?.addEventListener("click", () => {
+      console.log("CLICKED")
+      battleService.sendAttack(currentCreatureP1.attacks[1])
+    })
+    attack3?.addEventListener("click", () => {
+      console.log("CLICKED")
+      battleService.sendAttack(currentCreatureP1.attacks[2])
+    })
+    attack4?.addEventListener("click", () => {
+      console.log("CLICKED")
+      battleService.sendAttack(currentCreatureP1.attacks[3])
+    })
 }
 
 function setLevel() {

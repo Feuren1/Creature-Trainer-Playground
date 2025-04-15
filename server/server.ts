@@ -5,11 +5,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { Server } from "socket.io";
-import { RegisterUser, User } from "./types/user.js";
 import  bcrypt  from "bcrypt";
 import jwt from "jsonwebtoken"
 import 'dotenv/config'
 import { authenticateToken } from './middleware/auth.js';
+import { RegisterUser, User } from "./types/user/index.js";
+import { Attack } from "./types/game/creature.js"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -103,6 +104,11 @@ app.use(
 
  io.on("connection", (socket) => {
   console.log("a user connected");
+
+  socket.on("attack", (data: Attack) => {
+    console.log("Message from client:", data);
+    socket.emit("message", "Hello from server");
+  });
 
   socket.on("message", (data) => {
     console.log("Message from client:", data);
