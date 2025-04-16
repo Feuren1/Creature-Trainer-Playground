@@ -1,11 +1,11 @@
-import { Trainer } from "../user";
-import { Action, ActionType } from "./action";
-import { Creature } from "./creature";
+import { Trainer } from "../../types/user";
+import { Action, ActionType } from "../../types/game/action";
+import { Creature } from "../../types/game/creature";
 
 export class BattleState {
-  battleId: number;
+  /* battleId: number;
   player1: Trainer;
-  player2: Trainer;
+  player2: Trainer; */
   creaturesPlayer1: Creature[] = [];
   creaturesPlayer2: Creature[] = [];
   turn: number;

@@ -4,6 +4,7 @@ import { EventEmitter } from "pixi.js";
 import { AttackResponse } from "../types/battle/actionResponse";
 
 export class BattleService extends EventEmitter {
+
   socket: Socket;
   constructor(socket: Socket) {
     super();

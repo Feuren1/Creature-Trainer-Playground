@@ -173,17 +173,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     battleRenderer.renderTeamCreatureSymbols("P2", creaturesP2);
     app.stage.addChild(mainContainer);
     window.addEventListener("resize", () => battleRenderer.handleResize(app));
-
-    
     
   } catch (error) {
     console.error("Failed to load asset:", error);
   }
 });
-
-
-
-
 
 /* Loads the data and injects it into the HTML elements
  */
