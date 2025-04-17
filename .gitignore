@@ -24,3 +24,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+server/docker/CreateScript.sql
+server/docker/InsertCreatures.sql

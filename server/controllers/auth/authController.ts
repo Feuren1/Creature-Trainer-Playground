@@ -15,8 +15,8 @@ export async function register(req: any, res: any) {
   
     try {
     const { rows: emailExists } = await db.query(
-      "SELECT * FROM users WHERE email = $1", // SQL query with a placeholder
-      [user.email] // Parameterized value
+      "SELECT * FROM users WHERE email = $1", 
+      [user.email] 
     );
   
     if (emailExists.length > 0) {
@@ -26,8 +26,8 @@ export async function register(req: any, res: any) {
     }
   
     const { rows: userNameExsists } = await db.query(
-      "SELECT * FROM users WHERE username = $1", // SQL query with a placeholder
-      [user.username] // Parameterized value
+      "SELECT * FROM users where username = $1", 
+      [user.username]
     );
     if (userNameExsists.length > 0) {
       console.log(userNameExsists[0])
@@ -37,11 +37,11 @@ export async function register(req: any, res: any) {
   
     const hashedPassword = await bcrypt.hash(user.password, 12);
     const { rows: createdUser } = await db.query(
-      `INSERT INTO users (username, password_hash, email) 
-       VALUES ($1, $2, $3) 
+      `INSERT INTO users (username, password_hash, email, rank, "createdat", lastlogin) 
+       VALUES ($1, $2, $3, $4, Now(), Now()) 
        RETURNING *`,
-      [user.username, hashedPassword, user.email]
-    );
+      [user.username, hashedPassword, user.email, 0]
+    );    
     const { password_hash, ...userWithoutPassword } = createdUser[0];
     res.status(201).json(userWithoutPassword);
     } catch (error) {

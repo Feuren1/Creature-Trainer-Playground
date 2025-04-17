@@ -4,7 +4,6 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { Server } from "socket.io";
-import jwt from "jsonwebtoken";
 import "dotenv/config";
 import { BattleState } from "./game/battlePvP/battleState.js";
 import authRoutes from "./routes/auth/index.js";

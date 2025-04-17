@@ -13,10 +13,12 @@ export class BattleService extends EventEmitter {
 
   sendAttack(attack: Attack) {
     return new Promise((resolve, reject) => {
-        this.socket.emit("attack", attack, (response: AttackResponse & { error?: string }) => {
+        this.socket.emit("attack", attack, (response: any & { error?: string }) => {
+          console.log(response)
             if(response.error) {
                 reject(new Error(response.error));
             } else{
+              console.log(response)
                 resolve(response);
             }
         });

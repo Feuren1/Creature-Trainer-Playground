@@ -15,6 +15,9 @@ export type User = {
     user_id: string
     username: string
     password_hash: string
+    team: Creatures[]
+    
+    rank: Rank;
 }
 
 export interface UserPayload {
@@ -24,6 +27,6 @@ export interface UserPayload {
 
 export type Trainer = {
     userName: string;
-    rank: Rank;
+    
     //profilpicture
 }
