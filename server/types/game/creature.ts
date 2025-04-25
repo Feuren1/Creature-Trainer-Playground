@@ -5,16 +5,28 @@ export enum Element {
 }
 
 export type Creature = {
-    creature_id: string
-    hp: string
+    id: string
+    baseId: string
+    nickname:string
+    hp: number
     atk: number
     def: number
-    speed: number
-    attack1: Attack
-    attack2: Attack
-    attack3: Attack
-    attack4: Attack
+    spd: number
+    level: number
+    xp: number
     isActive: boolean
+    isFainted: boolean
+}
+
+export type CreautureBase = {
+    name: string
+    baseHp: number
+    baseAtk: number
+    baseDef: number
+    baseSpd: number
+    elementId: string
+    variant: string
+    lore: string
 }
 
 export type Attack = {

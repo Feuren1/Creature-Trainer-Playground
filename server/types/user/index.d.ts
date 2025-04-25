@@ -15,8 +15,6 @@ export type User = {
     user_id: string
     username: string
     password_hash: string
-    team: Creatures[]
-    
     rank: Rank;
 }
 

@@ -1,12 +1,12 @@
-import "./style.css";
+import "../style.css";
 import styles from "./main.module.css";
-import { HealthBar } from "./components/battleUI/healthbar/healthbar.ts";
+import { HealthBar } from "../components/battleUI/healthbar/healthbar.ts";
 import { Application, Assets, Container, Renderer, Sprite } from "pixi.js";
-import { Creature } from "./types/creature.ts";
-import { Element } from "./types/element.ts";
+import { Creature } from "../types/creature.ts";
+import { Element } from "../types/element.ts";
 import { io, Socket } from "socket.io-client";
-import { BattleService } from "./services/battleService.ts";
-import { BattleRenderer } from "./renderer/battleRenderer.ts";
+import { BattleService } from "../services/battleService.ts";
+import { BattleRenderer } from "../renderer/battleRenderer.ts";
 
 const socket = io("http://localhost:3000");
 const battleService: BattleService = new BattleService(socket);

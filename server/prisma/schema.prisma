@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid())
+  username   String   @unique
+  email      String   @unique
+  password_hash String
+  rank       Int      @default(0)
+  createdAt  DateTime @default(now())
+  lastLogin  DateTime?
+
+  teams      Team[]
+}
+
+model Team {
+  id       String   @id @default(uuid())
+  player   User     @relation(fields: [playerId], references: [id])
+  playerId String
+  isActive Boolean  @default(false)
+
+  creatures TeamCreature[]
+}
+
+model Element {
+  id    String  @id @default(uuid())
+  name  String  @unique
+  bases CreatureBase[]
+  attacks AttackBase[]
+}
+
+model CreatureBase {
+  id      String   @id @default(uuid())
+  name    String
+  spd     Int?
+  hp      Int?
+  atk     Int?
+  def     Int?
+  element Element? @relation(fields: [elementId], references: [id])
+  elementId String?
+  variant String?
+  lore    String?
+
+  creatures Creature[]
+}
+
+model Creature {
+  id       String   @id @default(uuid())
+  base     CreatureBase @relation(fields: [baseId], references: [id])
+  baseId   String
+  nickName String?
+  level    Int      @default(1)
+  xp       Int      @default(0)
+  isActive Boolean  @default(false)
+
+  attacks Attacks[]
+  team    TeamCreature?
+}
+
+model AttackBase {
+  id          String   @id @default(uuid())
+  name        String
+  atk         Int?
+  element     Element? @relation(fields: [elementId], references: [id])
+  elementId   String?
+  type        String?
+  usesLeft    Int?
+  description String?
+
+  attacks     Attacks[]
+}
+
+model Attacks {
+  id           String   @id @default(uuid())
+  creature     Creature @relation(fields: [creatureId], references: [id])
+  creatureId   String
+  attackBase   AttackBase @relation(fields: [attackBaseId], references: [id])
+  attackBaseId String
+  usesLeft     Int?
+  slotIndex    Int
+}
+
+model TeamCreature {
+  id          String   @id @default(uuid())
+  team        Team     @relation(fields: [teamId], references: [id])
+  teamId      String
+  creature    Creature @relation(fields: [creatureId], references: [id])
+  creatureId  String @unique
+  teamPosition Int
+}

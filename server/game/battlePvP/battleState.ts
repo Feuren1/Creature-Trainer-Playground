@@ -1,174 +1,142 @@
-import { Trainer } from "../../types/user";
-import { Action, ActionType } from "../../types/game/action.js";
-import { Creature,Element } from "../../types/game/creature.js";
+import { Action, ActionType, AttackAction } from "../../types/game/action.js";
+import { Attack, Creature, Element } from "../../types/game/creature.js";
+type player = {
+  creatures: Creature[];
+};
 
 export class BattleState {
   /* battleId: number;
   player1: Trainer;
-  player2: Trainer; */
-  creaturesPlayer1: Creature[] = [];
-  creaturesPlayer2: Creature[] = [];
+  player2: Trainer;  */
+  winner: "P1"|"P2"|"tbd";
+  teamPlayer1: player = {
+    creatures: [
+      {
+        id: "1",
+        baseId: "2",
+        nickname: "Salamander",
+        hp: 80,
+        atk: 75,
+        def: 60,
+        spd: 65,
+        level: 50,
+        xp: 0,
+        isActive: true,
+        isFainted: false,
+      },
+      {
+        id: "2",
+        baseId: "3",
+        nickname: "Lavamuth",
+        hp: 100,
+        atk: 60,
+        def: 85,
+        spd: 55,
+        level: 50,
+        xp: 0,
+        isActive: true,
+        isFainted: false,
+      },
+    ]
+  };
+  teamPlayer2: player = {
+    creatures: [
+      {
+        id: "3",
+        baseId: "4",
+        nickname: "Terror",
+        hp: 90,
+        atk: 80,
+        def: 70,
+        spd: 50,
+        level: 50,
+        xp: 0,
+        isActive: true,
+        isFainted: false
+      },
+      {
+        id: "2",
+        baseId: "3",
+        nickname: "Lavamuth",
+        hp: 100,
+        atk: 60,
+        def: 85,
+        spd: 55,
+        level: 50,
+        xp: 0,
+        isActive: true,
+        isFainted: false
+      },
+    ]
+  };
   turn: number;
   whoHasTurn: "P1" | "P2";
+
   constructor() {
-    this.creaturesPlayer1 = [{
-      creature_id: "1",
-      hp: "80",
-      atk: 60,
-      def: 65,
-      speed: 50,
-      attack1: {
-        id: "1",
-        name: "Attack1",
-        strength: 70,
-        element: Element.WATER
-      },
-      attack2: {
-        id: "2",
-        name: "Attack1",
-        strength: 50,
-        element: Element.WATER
-      },
-      attack3: {
-        id: "3",
-        name: "Attack1",
-        strength: 60,
-        element: Element.WATER
-      },
-      attack4: {
-        id: "4",
-        name: "Attack1",
-        strength: 65,
-        element: Element.WATER
-      },
-      isActive: true
-    },{
-      creature_id: "1",
-      hp: "80",
-      atk: 60,
-      def: 65,
-      speed: 50,
-      attack1: {
-        id: "1",
-        name: "Attack1",
-        strength: 70,
-        element: Element.WATER
-      },
-      attack2: {
-        id: "2",
-        name: "Attack1",
-        strength: 50,
-        element: Element.WATER
-      },
-      attack3: {
-        id: "3",
-        name: "Attack1",
-        strength: 60,
-        element: Element.WATER
-      },
-      attack4: {
-        id: "4",
-        name: "Attack1",
-        strength: 65,
-        element: Element.WATER
-      },
-      isActive: true
-    }];
-    this.creaturesPlayer2 = [{
-      creature_id: "1",
-      hp: "80",
-      atk: 60,
-      def: 65,
-      speed: 50,
-      attack1: {
-        id: "1",
-        name: "Attack1",
-        strength: 70,
-        element: Element.WATER
-      },
-      attack2: {
-        id: "2",
-        name: "Attack1",
-        strength: 50,
-        element: Element.WATER
-      },
-      attack3: {
-        id: "3",
-        name: "Attack1",
-        strength: 60,
-        element: Element.WATER
-      },
-      attack4: {
-        id: "4",
-        name: "Attack1",
-        strength: 65,
-        element: Element.WATER
-      },
-      isActive: true
-    },{
-      creature_id: "1",
-      hp: "80",
-      atk: 60,
-      def: 65,
-      speed: 50,
-      attack1: {
-        id: "1",
-        name: "Attack1",
-        strength: 70,
-        element: Element.WATER
-      },
-      attack2: {
-        id: "2",
-        name: "Attack1",
-        strength: 50,
-        element: Element.WATER
-      },
-      attack3: {
-        id: "3",
-        name: "Attack1",
-        strength: 60,
-        element: Element.WATER
-      },
-      attack4: {
-        id: "4",
-        name: "Attack1",
-        strength: 65,
-        element: Element.WATER
-      },
-      isActive: true
-    }];
     this.turn = 0;
     this.whoHasTurn = this.whoMovesFirst();
+    this.winner="tbd";
   }
 
   whoMovesFirst(): "P1" | "P2" {
     const activeCreauteP1 = this.getActiveCreauteP1();
     const activeCreauteP2 = this.getActiveCreauteP2();
-    if (activeCreauteP1.speed > activeCreauteP2.speed) {
-      return "P1";
-    } else if (activeCreauteP1.speed === activeCreauteP2.speed) {
-      return "P1";
-    } else {
-      return Math.random() < 0.5 ? "P1" : "P2";
+    if (activeCreauteP1 && activeCreauteP2)
+      if (activeCreauteP1.spd > activeCreauteP2.spd) {
+        return "P1";
+      } else if (activeCreauteP1.spd === activeCreauteP2.spd) {
+        return Math.random() < 0.5 ? "P1" : "P2";
+      }
+    return "P2";
+  }
+
+  handleTurn(actionP1: Attack, actionP2: Attack) {
+    const movesFirst = this.whoMovesFirst();
+
+    if (movesFirst === "P1") {
+      this.applyDamage(this.getActiveCreauteP1(), actionP1, this.getActiveCreauteP2());
+      this.isBattleOver();
+      this.applyDamage(this.getActiveCreauteP2(), actionP2, this.getActiveCreauteP1());
+    }
+    if (movesFirst === "P2") {
+      this.applyDamage(this.getActiveCreauteP2(), actionP2, this.getActiveCreauteP1());
+      this.applyDamage(this.getActiveCreauteP1(), actionP1, this.getActiveCreauteP2());
     }
   }
 
-  handleTurn(actionP1: Action, actionP2: Action) {
-    if(actionP1.type === ActionType.SWITCH_CREATURE || actionP2.type === ActionType.SWITCH_CREATURE){
-      
+  applyDamage(attacker: Creature, attack: Attack, target: Creature){
+    target.hp -= attacker.atk + attack.strength;
+    if (target.hp < 0) {
+      target.isFainted == true;
     }
-    this.calculateFirstMove ()
   }
 
-  calculateFirstMove() {
-    const creatureP1 = this.getActiveCreauteP1();
-    const creatureP2 = this.getActiveCreauteP2();
+  isBattleOver(){
+    const p1Lost = this.teamPlayer1?.creatures.find((c) => !c.isFainted);
+    const p2Lost = this.teamPlayer2?.creatures.find((c) => !c.isFainted);
+    if (p1Lost) {
+      this.winner = "P2";
+    }
+    if (p2Lost) {
+      this.winner = "P1";
+    }
   }
 
-  getActiveCreauteP1(): Creature {
-    return this.creaturesPlayer1.find((c) => c.isActive)!;
+  getNoOfLivingCreatures(p:"P1"|"P2"): number|undefined{
+    if(p==="P1"){
+      return this.teamPlayer1.creatures.filter((creature)=> !creature.isFainted).length
+    }
+    if(p==="P2"){
+      return this.teamPlayer2.creatures.filter((creature)=> !creature.isFainted).length
+    }
   }
-  getActiveCreauteP2(): Creature {
-    return this.creaturesPlayer2.find((c) => c.isActive)!;
+  
+  /* Carefull with ! statement but should be made sure its ! somewhere else */
+  getActiveCreauteP1() {
+    return this.teamPlayer1.creatures.find((c) => c.isActive)!;
+  }
+
+  getActiveCreauteP2() {
+    return this.teamPlayer2.creatures.find((c) => c.isActive)!;
   }
 }
